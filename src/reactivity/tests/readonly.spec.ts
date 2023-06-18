@@ -1,4 +1,4 @@
-import { isReadonly, readonly } from "../reactive";
+import { isProxy, isReadonly, readonly } from "../reactive";
 describe("readonly", () => {
     it("happly path", () => {
         //not set
@@ -6,6 +6,7 @@ describe("readonly", () => {
         const wrapped = readonly(original);
         expect(wrapped).not.toBe(original);
         expect(wrapped.foo).toBe(1);
+        expect(isProxy(wrapped)).toBe(true);
     });
     it("should call console.warn when set", () => {
         console.warn = jest.fn();
