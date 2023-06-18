@@ -1,5 +1,5 @@
 import { extend } from "../shared";
-class ReactiveEffect {
+export class ReactiveEffect {
     private _fn: Function;
     deps = [];
     active = true;
