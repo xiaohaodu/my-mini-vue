@@ -5,6 +5,7 @@ import { reactive } from "./reactive";
 class RefImpl {
     private _value;
     private _rawValue;
+    public _v_isRef = true;
     public dep;
     constructor(value) {
         this._rawValue = value;
@@ -35,4 +36,11 @@ export function ref(value) {
 }
 function convert(value) {
     return isObject(value) ? reactive(value) : value;
+}
+
+export function isRef(ref) {
+    return !!ref._v_isRef;
+}
+export function unRef(ref) {
+    return isRef(ref) ? ref.value : ref;
 }
