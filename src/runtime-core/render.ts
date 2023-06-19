@@ -17,7 +17,8 @@ function processElement(vnode, container) {
     mountElement(vnode, container);
 }
 function mountElement(vnode, container) {
-    const el = document.createElement(vnode.type);
+    const el = (vnode.el = document.createElement(vnode.type));
+
     if (typeof vnode.children === "string") {
         el.textContent = vnode.children;
     } else if (Array.isArray(vnode.children)) {
@@ -33,14 +34,15 @@ function mountElement(vnode, container) {
 function processComponent(vnode, container) {
     mountComponent(vnode, container);
 }
-function mountComponent(vnode, container) {
-    const instance = createComponentInstance(vnode);
+function mountComponent(initialvnode, container) {
+    const instance = createComponentInstance(initialvnode);
     setupComponent(instance);
-    setupRenderEffect(instance, container);
+    setupRenderEffect(instance, initialvnode, container);
 }
-function setupRenderEffect(instance, container) {
-    const subTree = instance.render();
+function setupRenderEffect(instance, initialvnode, container) {
+    const subTree = instance.render.call(instance.proxy);
     //vnode -> patch
     //vnode -> element -> mount
     patch(subTree, container);
+    initialvnode.el = subTree.el;
 }
