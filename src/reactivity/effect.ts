@@ -9,8 +9,15 @@ export class ReactiveEffect {
         this.scheduler = scheduler;
     }
     run() {
+        if (!this.active) {
+            return this._fn();
+        }
+        shouldTrack = true;
         activeEffect = this;
-        return this._fn();
+        const result = this._fn();
+        //reset 
+        shouldTrack = false;
+        return result;
     }
     stop() {
         if (this.active) {
@@ -26,6 +33,7 @@ function cleanupEffect(effect) {
     effect.deps.forEach((dep: any) => {
         dep.delete(effect);
     });
+    effect.deps.length = 0;
 }
 let activeEffect;
 export function effect(fn, options: any = {}) {
@@ -77,5 +85,5 @@ export function trackEffects(dep) {
 }
 let shouldTrack = false;
 export function isTracking() {
-    return activeEffect !== undefined;
+    return shouldTrack && activeEffect !== undefined;
 }
