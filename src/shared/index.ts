@@ -16,3 +16,4 @@ export const camelize = (str: string) => {
 export const toHandlerKey = (str: string) => {
     return str ? "on" + capitclize(str) : "";
 };
+export const hasOwn = (val, key) => Object.prototype.hasOwnProperty.call(val, key);
