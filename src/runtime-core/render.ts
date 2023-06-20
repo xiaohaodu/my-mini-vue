@@ -19,7 +19,6 @@ function processElement(vnode, container) {
 }
 function mountElement(vnode, container) {
     const el = (vnode.el = document.createElement(vnode.type));
-
     if (vnode.shapeFlag & ShapeFlags.TEXT_CHILDREN) {
         el.textContent = vnode.children;
     } else if (vnode.shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
@@ -29,6 +28,13 @@ function mountElement(vnode, container) {
     }
     for (const key in vnode.props) {
         el.setAttribute(key, vnode.props[key]);
+    }
+    for (const key in vnode.props) {
+        const isOn = (key) => /^on[A-Z]/.test(key);
+        if (isOn(key)) {
+            const event = key.slice(2).toLowerCase();
+            el.addEventListener(event, vnode.props[key]);
+        }
     }
     container.append(el);
 };

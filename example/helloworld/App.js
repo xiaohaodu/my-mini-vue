@@ -6,7 +6,11 @@ export const App = {
         //     id: 'root', class: ['red', 'hard']
         // }, "hi, " + this.msg);
         return h("div", {
-            id: "root", class: ['red', 'hard']
+            id: "root",
+            class: ['red', 'hard'],
+            onclick() {
+                console.log('click');
+            }
         }, [h("p", { class: 'red' }, 'hi '), h("p", { class: 'blue' }, 'mini-vue')]);
     },
     setup(props) {
