@@ -1,5 +1,6 @@
 import { ShapeFlags } from "../shared/ShapeFlags";
 import { isObject } from "../shared/index";
+import { Fragment } from "./VNode";
 import { createComponentInstance, setupComponent } from "./component";
 
 export function render(vnode, container) {
@@ -7,13 +8,26 @@ export function render(vnode, container) {
     patch(vnode, container);
 }
 function patch(vnode, container) {
+    const { type, shapeFlag } = vnode;
+
+    switch (type) {
+        case Fragment:
+            processFragment(vnode, container);
+            break;
+        case Text:
+            processText(vnode, container);
+            break;
+    }
     //处理组件
-    if (vnode.shapeFlag & ShapeFlags.ELEMENT) {
+    if (shapeFlag & ShapeFlags.ELEMENT) {
         processElement(vnode, container);
-    } else if (vnode.shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
+    } else if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
         processComponent(vnode, container);
     }
 }
+function processFragment(vnode, container) {
+    mountChildren(vnode, container);
+};
 function processElement(vnode, container) {
     mountElement(vnode, container);
 }
@@ -22,9 +36,7 @@ function mountElement(vnode, container) {
     if (vnode.shapeFlag & ShapeFlags.TEXT_CHILDREN) {
         el.textContent = vnode.children;
     } else if (vnode.shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
-        for (const val of vnode.children) {
-            patch(val, el);
-        }
+        mountChildren(vnode, el);
     }
     for (const key in vnode.props) {
         el.setAttribute(key, vnode.props[key]);
@@ -46,10 +58,21 @@ function mountComponent(initialvnode, container) {
     setupComponent(instance);
     setupRenderEffect(instance, initialvnode, container);
 }
+function mountChildren(vnode, container) {
+    for (const val of vnode.children) {
+        patch(val, container);
+    }
+}
 function setupRenderEffect(instance, initialvnode, container) {
     const subTree = instance.render.call(instance.proxy);
     //vnode -> patch
     //vnode -> element -> mount
     patch(subTree, container);
     initialvnode.el = subTree.el;
+}
+
+function processText(vnode: any, container: any) {
+    const { children } = vnode;
+    const textNode = (vnode.el = document.createTextNode(children));
+    container.append(textNode);
 }
