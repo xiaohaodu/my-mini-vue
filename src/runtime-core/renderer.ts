@@ -118,7 +118,37 @@ export function createRenderer(options) {
                 hostRemove(children1[i].el);
                 i++;
             }
+        } else {
+            let s1 = i, s2 = i;
+            const toBePatched = e2 - s2 + 1;
+            let patched = 0;
+            const keyToNewIndexMap = new Map();
+            for (let i = s2; i <= e2; i++) {
+                const prevChild = children1[i];
+                if (patched >= toBePatched) {
+                    hostRemove(prevChild.el);
+                    continue;
+                }
+                let newIndex;
+                if (prevChild !== null) {
+                    newIndex = keyToNewIndexMap.get(prevChild.key);
+                } else {
+                    for (let j = s2; j < e2; j++) {
+                        if (isSomeVNodeType(prevChild, children2[j])) {
+                            newIndex = j;
+                            break;
+                        }
+                    }
+                }
+                if (newIndex === undefined) {
+                    hostRemove(prevChild.el);
+                } else {
+                    patch(prevChild, children2[newIndex], container, parentComponent, null);
+                    patched++;
+                }
+            }
         }
+
     }
     function unmountChildren(children) {
         for (let i = 0; i < children.length; i++) {
