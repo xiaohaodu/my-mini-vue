@@ -127,8 +127,12 @@ export function createRenderer(options) {
             const newIndexToOldIndexMap = new Array(toBePatched);
             let moved = false, maxNewIndexSofar = 0;
             for (let i = 0; i < toBePatched; i++)newIndexToOldIndexMap[i] = 0;
-
             for (let i = s2; i <= e2; i++) {
+                const nextChild = children2[i];
+                keyToNewIndexMap.set(nextChild.key, i);
+
+            }
+            for (let i = s1; i <= e1; i++) {
                 const prevChild = children1[i];
                 if (patched >= toBePatched) {
                     hostRemove(prevChild.el);
@@ -138,7 +142,7 @@ export function createRenderer(options) {
                 if (prevChild !== null) {
                     newIndex = keyToNewIndexMap.get(prevChild.key);
                 } else {
-                    for (let j = s2; j < e2; j++) {
+                    for (let j = s2; j <= e2; j++) {
                         if (isSomeVNodeType(prevChild, children2[j])) {
                             newIndex = j;
                             break;
