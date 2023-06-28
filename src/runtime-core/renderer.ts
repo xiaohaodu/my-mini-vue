@@ -5,6 +5,7 @@ import { Fragment } from "./VNode";
 import { createComponentInstance, setupComponent } from "./component";
 import { shouldUpdateComponent } from "./componentUpdateUtils";
 import { createAppAPI } from "./createApp";
+import { queueJobs } from "./scheduler";
 
 export function createRenderer(options) {
     const {
@@ -272,6 +273,10 @@ export function createRenderer(options) {
                 const prevSubTree = instance.subTree;
                 instance.subTree = subTree;
                 patch(prevSubTree, subTree, container, instance, anchor);
+            }
+        }, {
+            scheduler() {
+                queueJobs(instance.update);
             }
         });
     }
